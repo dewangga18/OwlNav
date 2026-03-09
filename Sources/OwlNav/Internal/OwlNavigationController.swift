@@ -32,6 +32,7 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
         suppressNextSystemPopEvent = true
     }
 
+    /// Configures the navigation controller for swipe-back gesture support.
     override func viewDidLoad() {
         super.viewDidLoad()
         delegate = self
