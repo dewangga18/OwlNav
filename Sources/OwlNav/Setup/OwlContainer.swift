@@ -39,7 +39,14 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
 
     /// Updates the `UINavigationController` to match the current state of the `OwlNav` stack.
     public func updateUIViewController(_ navigation: UINavigationController, context: Context) {
-        if navigation.transitionCoordinator != nil {
+        syncNavigation(navigation)
+    }
+
+    private func syncNavigation(_ navigation: UINavigationController) {
+        if let coordinator = navigation.transitionCoordinator {
+            coordinator.animate(alongsideTransition: nil) { _ in
+                syncNavigation(navigation)
+            }
             return
         }
 

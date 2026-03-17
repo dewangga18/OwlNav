@@ -51,20 +51,17 @@ import SwiftUI
     /// Pops to a specific route in the stack.
     /// - Parameters:
     ///   - route: The target route to pop to.
-    ///   - inclusive: If `true`, the target route itself will also be popped.
+    ///   - inclusive: If `true`, the target route itself will also be popped unless it is the root.
     ///   - animated: Whether the pop should be animated.
     public func popTo(_ route: T, inclusive: Bool = false, animated: Bool = true) {
         guard !routes.isEmpty else { return }
 
-        guard var foundIndex = routes.lastIndex(where: { $0 == route }) else { return }
+        guard let matchIndex = routes.lastIndex(where: { $0 == route }) else { return }
 
-        if !inclusive {
-            foundIndex += 1
-        }
+        var targetIndex = matchIndex + (inclusive ? 0 : 1)
+        targetIndex = max(targetIndex, 1)
 
-        foundIndex = max(foundIndex, 1)
-
-        let numToPop = (foundIndex..<routes.endIndex).count
+        let numToPop = (targetIndex..<routes.endIndex).count
         guard numToPop > 0 else { return }
 
         pendingPopAnimated = animated

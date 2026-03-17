@@ -12,7 +12,7 @@ public struct WithSwipeBackModifier: ViewModifier {
     /// Binding to the current stack count.
     @Binding var stackCount: Int
     
-    /// Callback triggered when a pop operation completes.
+    /// Callback triggered when a system swipe-back pop completes.
     var onPopCompleted: (() -> Void)?
 
     public func body(content: Content) -> some View {
@@ -30,7 +30,7 @@ public struct WithSwipeBackModifier: ViewModifier {
 public struct SwipeBackController: UIViewControllerRepresentable {
     /// Binding to the current stack count.
     @Binding var stackCount: Int
-    /// Callback triggered when a pop operation completes.
+    /// Callback triggered when a system swipe-back pop completes.
     var onPopCompleted: (() -> Void)?
 
     public func makeUIViewController(context: Context) -> UIViewController {

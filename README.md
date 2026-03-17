@@ -71,7 +71,3 @@ struct RootView: View {
     }
 }
 ```
-
-## Example
-
-Example app code lives outside `Sources/` at `Example/OwlNavExampleApp.swift` (copy it into an iOS app target to try it).

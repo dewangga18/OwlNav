@@ -43,7 +43,7 @@ extension View {
     /// Enables the custom swipe-back gesture for the view.
     /// - Parameters:
     ///   - stackCount: A binding to the current navigation stack count.
-    ///   - onPopCompleted: An optional callback triggered when a pop operation completes.
+    ///   - onPopCompleted: An optional callback triggered when a system swipe-back pop completes.
     /// - Returns: A view with swipe-back functionality enabled.
     public func withSwipeBack(stackCount: Binding<Int>, onPopCompleted: (() -> Void)? = nil) -> some View {
         modifier(WithSwipeBackModifier(stackCount: stackCount, onPopCompleted: onPopCompleted))
