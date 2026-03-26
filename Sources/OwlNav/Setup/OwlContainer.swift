@@ -59,8 +59,10 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
 
             for (offset, route) in newRoutes.enumerated() {
                 let isLast = offset == newRoutes.count - 1
+                let hosting = UIHostingController(rootView: routeMap(route))
+                hosting.view.tag = route.hashValue
                 navigation.pushViewController(
-                    UIHostingController(rootView: routeMap(route)),
+                    hosting,
                     animated: shouldAnimate && isLast
                 )
             }
@@ -69,20 +71,49 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
         else if targetStack < currentStack {
             guard targetStack > 0 else { return }
 
-            let targetVC = navigation.viewControllers[targetStack - 1]
+            // Build the target stack in one shot:
+            // reuse existing VCs where the route is unchanged, recreate where it differs (e.g. reset to a new root).
+            var newStack: [UIViewController] = []
+            for index in 0..<targetStack {
+                let route = owl.routes[index]
+                let existing = navigation.viewControllers[index] as? UIHostingController<Screen>
+
+                if let existing, existing.view.tag == route.hashValue {
+                    newStack.append(existing)
+                } else {
+                    let newHosting = UIHostingController(rootView: routeMap(route))
+                    newHosting.view.tag = route.hashValue
+                    newStack.append(newHosting)
+                }
+            }
+
             (navigation as? OwlNavigationController)?.suppressNextSystemPop()
-            navigation.popToViewController(
-                targetVC,
-                animated: owl.consumePendingPopAnimated()
-            )
+            navigation.setViewControllers(newStack, animated: owl.consumePendingPopAnimated())
         }
 
         else if targetStack == currentStack && targetStack > 0 {
-            for index in 0..<targetStack {
-                let hosting = navigation.viewControllers[index] as? UIHostingController<Screen>
-                let route = owl.routes[index]
+            var newStack = navigation.viewControllers
+            var didChange = false
 
-                hosting?.rootView = routeMap(route)
+            for index in 0..<targetStack {
+                let route = owl.routes[index]
+                let existing = navigation.viewControllers[index] as? UIHostingController<Screen>
+
+                // Compare by re-rendering only if the route changed.
+                // We tag each HC with its route hash to avoid recreating unchanged screens.
+                let existingTag = existing?.view.tag
+                let routeHash = route.hashValue  // T: Equatable — safe enough for identity tracking
+
+                if existingTag != routeHash {
+                    let newHosting = UIHostingController(rootView: routeMap(route))
+                    newHosting.view.tag = routeHash
+                    newStack[index] = newHosting
+                    didChange = true
+                }
+            }
+
+            if didChange {
+                navigation.setViewControllers(newStack, animated: false)
             }
         }
     }

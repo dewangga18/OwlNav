@@ -1,3 +1,5 @@
+![Version](https://img.shields.io/badge/version-0.0.2-blue) ![iOS](https://img.shields.io/badge/iOS-15%2B-lightgrey) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) <br/>
+
 # OwlNav
 
 `OwlNav` is a lightweight Swift Package that bridges SwiftUI routing to a UIKit-backed `UINavigationController`.
