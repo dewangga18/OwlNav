@@ -60,7 +60,7 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
             for (offset, route) in newRoutes.enumerated() {
                 let isLast = offset == newRoutes.count - 1
                 let hosting = UIHostingController(rootView: routeMap(route))
-                hosting.view.tag = route.hashValue
+                hosting.view.tag = String(describing: route).hashValue
                 navigation.pushViewController(
                     hosting,
                     animated: shouldAnimate && isLast
@@ -76,13 +76,14 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
             var newStack: [UIViewController] = []
             for index in 0..<targetStack {
                 let route = owl.routes[index]
+                let routeHash = String(describing: route).hashValue
                 let existing = navigation.viewControllers[index] as? UIHostingController<Screen>
 
-                if let existing, existing.view.tag == route.hashValue {
+                if let existing, existing.view.tag == routeHash {
                     newStack.append(existing)
                 } else {
                     let newHosting = UIHostingController(rootView: routeMap(route))
-                    newHosting.view.tag = route.hashValue
+                    newHosting.view.tag = routeHash
                     newStack.append(newHosting)
                 }
             }
@@ -100,9 +101,9 @@ public struct OwlContainer<T: Equatable, Screen: View>: UIViewControllerRepresen
                 let existing = navigation.viewControllers[index] as? UIHostingController<Screen>
 
                 // Compare by re-rendering only if the route changed.
-                // We tag each HC with its route hash to avoid recreating unchanged screens.
+                // We tag each HC with its string description hash to avoid recreating unchanged screens.
                 let existingTag = existing?.view.tag
-                let routeHash = route.hashValue  // T: Equatable — safe enough for identity tracking
+                let routeHash = String(describing: route).hashValue
 
                 if existingTag != routeHash {
                     let newHosting = UIHostingController(rootView: routeMap(route))
