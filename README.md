@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.0.2-blue) ![iOS](https://img.shields.io/badge/iOS-15%2B-lightgrey) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) <br/>
+![Version](https://img.shields.io/badge/version-0.1.0-blue) ![iOS](https://img.shields.io/badge/iOS-15%2B-lightgrey) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) <br/>
 
 # OwlNav
 
@@ -66,10 +66,34 @@ struct RootView: View {
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .withSwipeBack(stackCount: Binding(get: { state.owl.routes.count }, set: { _ in })) {
+            .withSwipeBack {
                 print("Route: \(state.owl.routes)")
             }
         }
     }
 }
+```
+
+## Migration from 0.0.3
+
+### `withSwipeBack` API Change
+
+The old `withSwipeBack(stackCount:onPopCompleted:)` signature is deprecated. Use the new simplified form:
+
+```diff
+-// Old (deprecated)
+-.withSwipeBack(stackCount: Binding(get: { state.owl.routes.count }, set: { _ in })) {
+-    print("Route: \(state.owl.routes)")
+-}
+
++// New
++.withSwipeBack {
++    print("Route: \(state.owl.routes)")
++}
+```
+
+The swipe-back gesture is enabled by default. To disable it on a specific screen, pass `isEnabled: false`:
+
+```swift
+.withSwipeBack(isEnabled: false)
 ```

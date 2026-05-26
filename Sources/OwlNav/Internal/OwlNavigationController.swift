@@ -5,15 +5,14 @@
 //  Created by aaronevanjulio on 06/03/26.
 //
 
+#if canImport(UIKit)
+import UIKit
 import SwiftUI
 
 /// A custom `UINavigationController` that handles system pop gestures and coordinates with `OwlNav`.
 final class OwlNavigationController: UINavigationController, UINavigationControllerDelegate, UIGestureRecognizerDelegate {
     /// Callback triggered when a system pop (like swipe back) is initiated.
     var onSystemPop: (() -> Void)?
-
-    /// Callback triggered when a system pop operation is completed.
-    var onSystemPopCompleted: (() -> Void)?
 
     /// Internal flag to suppress the next system pop event signaling.
     private var suppressNextSystemPopEvent: Bool = false
@@ -26,6 +25,9 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
 
     /// Flag indicating if the current pop is being handled by the transition coordinator.
     private var popHandledByCoordinator: Bool = false
+
+    /// Flag to prevent duplicate sync calls when a transition is in flight.
+    var isSyncScheduled: Bool = false
 
     /// Suppresses the next system pop event notification.
     func suppressNextSystemPop() {
@@ -50,6 +52,12 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
         guard (CACurrentMediaTime() - lastTransitionEndTime) >= transitionCooldown else {
             return false
         }
+
+        // Check the per-VC swipe-back flag via associated objects.
+        if let top = topViewController, !top.owlSwipeBackEnabled {
+            return false
+        }
+
         return true
     }
 
@@ -65,6 +73,7 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
         coordinator.animate(alongsideTransition: nil) { [weak self] context in
             guard let self, !context.isCancelled else { return }
 
+            self.isSyncScheduled = false
 
             guard let fromVC = context.viewController(forKey: .from),
                   !self.viewControllers.contains(fromVC)
@@ -72,13 +81,14 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
 
             if self.suppressNextSystemPopEvent {
                 self.suppressNextSystemPopEvent = false
-                self.onSystemPopCompleted = nil
                 return
             }
 
             self.onSystemPop?()
-            let completion = self.onSystemPopCompleted
-            self.onSystemPopCompleted = nil
+
+            // Trigger the per-VC pop completed callback.
+            let completion = fromVC.owlPopCompleted
+            fromVC.owlPopCompleted = nil
             completion?()
         }
     }
@@ -89,8 +99,27 @@ final class OwlNavigationController: UINavigationController, UINavigationControl
         
         if !popHandledByCoordinator, suppressNextSystemPopEvent {
             suppressNextSystemPopEvent = false
-            onSystemPopCompleted = nil
         }
         popHandledByCoordinator = false
     }
 }
+
+// MARK: - UIViewController Associated Objects for per-VC swipe-back state
+
+private var swipeBackEnabledKey: UInt8 = 0
+private var popCompletedKey: UInt8 = 0
+
+extension UIViewController {
+    /// Whether the swipe-back gesture is enabled for this view controller. Defaults to `true`.
+    var owlSwipeBackEnabled: Bool {
+        get { objc_getAssociatedObject(self, &swipeBackEnabledKey) as? Bool ?? true }
+        set { objc_setAssociatedObject(self, &swipeBackEnabledKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
+
+    /// An optional callback triggered when this view controller is popped by a system gesture.
+    var owlPopCompleted: (() -> Void)? {
+        get { objc_getAssociatedObject(self, &popCompletedKey) as? (() -> Void) }
+        set { objc_setAssociatedObject(self, &popCompletedKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    }
+}
+#endif
