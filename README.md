@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/version-0.1.0-blue) ![iOS](https://img.shields.io/badge/iOS-15%2B-lightgrey) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) <br/>
+![Version](https://img.shields.io/badge/version-0.0.4-blue) ![iOS](https://img.shields.io/badge/iOS-15%2B-lightgrey) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) <br/>
 
 # OwlNav
 
