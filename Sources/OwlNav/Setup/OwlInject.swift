@@ -27,6 +27,7 @@ import UIKit
         let appearance = UINavigationBar.appearance()
         appearance.standardAppearance = navAppearance
         appearance.compactAppearance = navAppearance
+        appearance.scrollEdgeAppearance = navAppearance
         appearance.tintColor = .clear
         appearance.isHidden = true
 

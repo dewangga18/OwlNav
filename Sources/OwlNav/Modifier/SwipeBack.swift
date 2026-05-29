@@ -9,9 +9,9 @@ import SwiftUI
 
 /// A `ViewModifier` that enables the swipe-back gesture and coordinates pop completion callbacks.
 public struct WithSwipeBackModifier: ViewModifier {
-    /// Binding to the current stack count.
-    @Binding var stackCount: Int
-    
+    /// Whether the swipe-back gesture is enabled.
+    @Binding var isEnabled: Bool
+
     /// Callback triggered when a system swipe-back pop completes.
     var onPopCompleted: (() -> Void)?
 
@@ -19,7 +19,7 @@ public struct WithSwipeBackModifier: ViewModifier {
         content
             .background(
                 SwipeBackController(
-                    stackCount: $stackCount,
+                    isEnabled: $isEnabled,
                     onPopCompleted: onPopCompleted
                 )
             )
@@ -28,8 +28,9 @@ public struct WithSwipeBackModifier: ViewModifier {
 
 /// A background utility controller that enables the native swipe-back gesture based on stack state.
 public struct SwipeBackController: UIViewControllerRepresentable {
-    /// Binding to the current stack count.
-    @Binding var stackCount: Int
+    /// Whether the swipe-back gesture is enabled.
+    @Binding var isEnabled: Bool
+
     /// Callback triggered when a system swipe-back pop completes.
     var onPopCompleted: (() -> Void)?
 
@@ -40,12 +41,10 @@ public struct SwipeBackController: UIViewControllerRepresentable {
     }
 
     public func updateUIViewController(_ vc: UIViewController, context: Context) {
-        guard let nav = vc.navigationController else { return }
+        // Walk up to the nearest UIHostingController to set associated-object flags.
+        guard let hostingVC = vc.parent else { return }
 
-        nav.interactivePopGestureRecognizer?.isEnabled = stackCount > 1
-
-        if let safeNav = nav as? OwlNavigationController {
-            safeNav.onSystemPopCompleted = onPopCompleted
-        }
+        hostingVC.owlSwipeBackEnabled = isEnabled
+        hostingVC.owlPopCompleted = onPopCompleted
     }
 }

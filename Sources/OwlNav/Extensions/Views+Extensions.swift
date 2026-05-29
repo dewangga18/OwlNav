@@ -42,10 +42,20 @@ extension View {
 
     /// Enables the custom swipe-back gesture for the view.
     /// - Parameters:
+    ///   - isEnabled: A binding that controls whether the swipe-back gesture is enabled. Defaults to `.constant(true)`.
+    ///   - onPopCompleted: An optional callback triggered when a system swipe-back pop completes.
+    /// - Returns: A view with swipe-back functionality enabled.
+    public func withSwipeBack(isEnabled: Binding<Bool> = .constant(true), onPopCompleted: (() -> Void)? = nil) -> some View {
+        modifier(WithSwipeBackModifier(isEnabled: isEnabled, onPopCompleted: onPopCompleted))
+    }
+
+    /// Enables the custom swipe-back gesture for the view.
+    /// - Parameters:
     ///   - stackCount: A binding to the current navigation stack count.
     ///   - onPopCompleted: An optional callback triggered when a system swipe-back pop completes.
     /// - Returns: A view with swipe-back functionality enabled.
+    @available(*, deprecated, message: "Use withSwipeBack(isEnabled:onPopCompleted:) instead.")
     public func withSwipeBack(stackCount: Binding<Int>, onPopCompleted: (() -> Void)? = nil) -> some View {
-        modifier(WithSwipeBackModifier(stackCount: stackCount, onPopCompleted: onPopCompleted))
+        modifier(WithSwipeBackModifier(isEnabled: .constant(stackCount.wrappedValue > 1), onPopCompleted: onPopCompleted))
     }
 }
