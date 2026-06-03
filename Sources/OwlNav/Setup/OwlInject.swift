@@ -16,7 +16,7 @@ public enum OwlNavBarBehavior {
 /// A utility struct to inject global navigation styles.
 @MainActor public struct OwlInject {
     /// Configures the global appearance of the navigation bar to be transparent and hides the back button.
-    public static func initFunc(navBarBehavior: OwlNavBarBehavior = .alwaysHidden) {
+    public static func initFunc(navBarBehavior: OwlNavBarBehavior = .transparentWhenAtTop) {
         let backButtonAppearance = UIBarButtonItemAppearance()
         backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
         backButtonAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.clear]
