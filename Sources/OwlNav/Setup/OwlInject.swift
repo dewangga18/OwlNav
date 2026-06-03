@@ -15,17 +15,18 @@ import UIKit
         let backButtonAppearance = UIBarButtonItemAppearance()
         backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.clear]
         backButtonAppearance.highlighted.titleTextAttributes = [.foregroundColor: UIColor.clear]
+        backButtonAppearance.normal.titlePositionAdjustment = UIOffset(horizontal: -1000, vertical: 0)
 
         let navAppearance = UINavigationBarAppearance()
         navAppearance.configureWithTransparentBackground()
         navAppearance.backButtonAppearance = backButtonAppearance
         navAppearance.setBackIndicatorImage(UIImage(), transitionMaskImage: UIImage())
+        navAppearance.titleTextAttributes = [.foregroundColor: UIColor.clear]
 
         let appearance = UINavigationBar.appearance()
         appearance.standardAppearance = navAppearance
         appearance.compactAppearance = navAppearance
         appearance.tintColor = .clear
-        appearance.isHidden = true
 
         if #available(iOS 15.0, *) {
             appearance.compactScrollEdgeAppearance = navAppearance
