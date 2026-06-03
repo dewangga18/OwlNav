@@ -21,7 +21,6 @@ extension View {
             } else {
                 self
                     .toolbar(.visible, for: .navigationBar)
-                    .toolbarBackground(.automatic, for: .navigationBar)
             }
         } else {
             self
