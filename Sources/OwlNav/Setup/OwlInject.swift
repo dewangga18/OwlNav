@@ -27,10 +27,6 @@ import UIKit
         appearance.standardAppearance = navAppearance
         appearance.compactAppearance = navAppearance
         appearance.tintColor = .clear
-
-        if #available(iOS 15.0, *) {
-            appearance.compactScrollEdgeAppearance = navAppearance
-        }
     }
 }
 #endif
